@@ -1,5 +1,7 @@
 package org.example.Windows;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,6 +22,7 @@ public class MainWindow {
     private String password;
     private JButton saveButton = new JButton("Save");
     GridLayout gridLayout = new GridLayout(5,1);
+    Dotenv dotenv;
 
     List<Object> account;
 
@@ -71,12 +74,21 @@ public class MainWindow {
                 username = usernameInput.getText();
                 password = passwordInput.getText();
 
+                dotenv = Dotenv.configure().load();
+
+                String usernameLogin = dotenv.get("USERNAME_LOGIN");
+                String passwordLogin = dotenv.get("PASSWORD_LOGIN");
+
                 if (!Objects.equals(username, "") && !Objects.equals(password, "")){
 
                     account = new ArrayList<>();
 
                     account.add(username);
                     account.add(password);
+
+                    if (username.equals(usernameLogin) && password.equals(passwordLogin)){
+                        System.out.println("Welcome User");
+                    }
 
 
                 }else {
