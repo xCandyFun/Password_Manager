@@ -72,8 +72,6 @@ public class MainWindow {
                 password = passwordInput.getText();
 
                 if (!Objects.equals(username, "") && !Objects.equals(password, "")){
-                    //System.out.println(username);
-                    //System.out.println(password);
 
                     account = new ArrayList<>();
 
