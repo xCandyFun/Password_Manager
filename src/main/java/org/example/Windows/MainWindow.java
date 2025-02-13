@@ -88,9 +88,10 @@ public class MainWindow {
                     account.add(password);
 
                     if (username.equals(usernameLogin) && password.equals(passwordLogin)){
+                        System.out.println("Welcome Admin");
+                    } else {
                         System.out.println("Welcome User");
                     }
-
 
                 }else {
                     System.out.println("The text field is empty");
