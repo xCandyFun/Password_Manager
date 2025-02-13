@@ -74,7 +74,8 @@ public class MainWindow {
                 username = usernameInput.getText();
                 password = passwordInput.getText();
 
-                dotenv = Dotenv.configure().load();
+                //dotenv = Dotenv.configure().load();
+                dotenv = Dotenv.configure().directory("./").filename(".env").load();
 
                 String usernameLogin = dotenv.get("USERNAME_LOGIN");
                 String passwordLogin = dotenv.get("PASSWORD_LOGIN");
