@@ -1,11 +1,11 @@
 package org.example;
 
-import org.example.Windows.MainWindow;
+import org.example.Windows.LoginWindow;
 
 public class Main {
-    static MainWindow mainWindow = new MainWindow();
+    static LoginWindow loginWindow = new LoginWindow();
 
     public static void main(String[] args) {
-        mainWindow.RunWindow();
+        loginWindow.RunWindow();
     }
 }
