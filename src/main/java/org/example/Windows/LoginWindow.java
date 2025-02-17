@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -39,8 +40,10 @@ public class LoginWindow {
     private JButton loginButton = new JButton("Login");
     private JButton resignButton = new JButton("Resign");
 
-    private final String filePath = "./";
+    private final String filePath = "D:\\";
     private final String fileName = ".env";
+    private final String fullPath = "D:\\.env";
+    private final File envFile = new File(fullPath);
 
     Dotenv dotenv;
 
@@ -128,12 +131,26 @@ public class LoginWindow {
 
                 getTextFromTextField(usernameInput, passwordInput);
 
-                account = new ArrayList<>();
+                if (!username.isEmpty() && !password.isEmpty()){
 
-                account.add(username);
-                account.add(password);
+                    account = new ArrayList<>();
 
-                fileHandler.EnvEditor(account);
+                    //TODO have a regex to remove unwanted characters
+                    account.add(username);
+                    account.add(password);
+
+                    //TODO Don't override content in env file
+                    if (!envFile.exists()){
+                        fileHandler.EnvEditor(account, frame);
+                    }else {
+                        JOptionPane.showMessageDialog(frame, "under progress");
+                    }
+
+                }else {
+                    JOptionPane.showMessageDialog(frame, "ERROR: The fields are empty !");
+                }
+
+
             }
         });
     }
