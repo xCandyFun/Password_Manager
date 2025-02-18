@@ -13,18 +13,23 @@ public class FileHandler {
     private final Map<Object, Object> envMapUsername = new HashMap<>();
     private final Map<Object, Object> envMapPassword = new HashMap<>();
 
-
     public void EnvEditor(List<Object> account, JFrame frame){
 
+        //TODO maybe encrypt password
         Object key = account.get(0);
         Object value = account.get(1);
 
         System.out.println(key);
         System.out.println(value);
 
-        SaveEnvFile(account,frame);
+        long isEmpty = 0;
 
-        //TODO Don't override the content inside the env file
+        if (envFile.length() == isEmpty){
+            SaveEnvFile(account,frame);
+        }else {
+            JOptionPane.showMessageDialog(frame, "ERROR: The file has content");
+        }
+
     }
 
     private void SaveEnvFile(List<Object> account, JFrame frame){
