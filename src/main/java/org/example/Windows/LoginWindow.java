@@ -8,11 +8,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LoginWindow {
 
@@ -28,14 +31,17 @@ public class LoginWindow {
 
     private JPanel usernamePanel = new JPanel();
     private JPanel passwordPanel = new JPanel();
+    private JPanel obsPanel = new JPanel();
     private JPanel loginButtonPanel = new JPanel();
-    private JLabel usernameLabel;
+    private JLabel emailLabel;
     private JLabel passwordLabel;
-    private String username;
+    private JLabel obsLabel;
+    private String email;
     private String password;
 
     private JTextField usernameInput;
-    private JTextField passwordInput;
+    //private JTextField passwordInput;
+    private JPasswordField passwordInput;
 
     private JButton loginButton = new JButton("Login");
     private JButton resignButton = new JButton("Resign");
@@ -51,21 +57,33 @@ public class LoginWindow {
 
     public void RunWindow() {
 
-        if (!Files.exists(Path.of(filePath + fileName))) {
-            JOptionPane.showMessageDialog(frame, ".env file is missing");
-            System.exit(0);
+        if (!Files.exists(Path.of(fullPath))) {
+            try {
+                if (envFile.createNewFile()) {
+                    System.out.println("The file has been created");
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(frame, "Failed to create the file");
+                System.exit(0);
+            }
         }
 
         frame.setSize(800, 800);
 
-        usernameLabel = new JLabel("Username: ");
+        emailLabel = new JLabel("Email: ");
         usernameInput = new JTextField(20);
 
         passwordLabel = new JLabel("Password: ");
-        passwordInput = new JTextField(20);
+        passwordInput = new JPasswordField(20);
+
+        obsLabel = new JLabel("<html>*OBS: password need <br> -least one digit " +
+                "<br> -least one lowercase and uppercase letter <br> -least one special character (@#$%^&+=!_) " +
+                "<br> -no whitespace characters <br> -total length least 8 characters</html>");
+
+        obsLabel.setFont(new Font("Arial", Font.BOLD, 12));
 
 
-        ContentInTheWindow(usernameInput, passwordInput);
+        ContentInTheWindow(usernameInput, passwordInput, obsLabel);
 
         ButtonAction(usernameInput, passwordInput);
 
@@ -79,18 +97,21 @@ public class LoginWindow {
 
     }
 
-    private void ContentInTheWindow(JTextField usernameInput, JTextField passwordInput) {
-        usernamePanel.add(usernameLabel);
+    private void ContentInTheWindow(JTextField usernameInput, JTextField passwordInput, JLabel obsLabel) {
+        usernamePanel.add(emailLabel);
         usernamePanel.add(usernameInput);
 
         passwordPanel.add(passwordLabel);
         passwordPanel.add(passwordInput);
+        passwordPanel.add(obsLabel);
+        obsPanel.add(obsLabel);
 
         loginButtonPanel.add(loginButton);
         loginButtonPanel.add(resignButton);
 
         loginPanel.add(usernamePanel);
         loginPanel.add(passwordPanel);
+        loginPanel.add(obsPanel);
         loginPanel.add(loginButtonPanel);
 
         frame.add(loginPanel);
@@ -105,11 +126,13 @@ public class LoginWindow {
 
                 dotenv = Dotenv.configure().directory(filePath).filename(fileName).load();
 
+                //TODO unencrypt the password
+
                 String usernameLogin = dotenv.get("USERNAME_LOGIN");
                 String passwordLogin = dotenv.get("PASSWORD_LOGIN");
 
-                if ((!Objects.equals(username, "") && !Objects.equals(password, "") &&
-                        (username.equals(usernameLogin) && password.equals(passwordLogin)))) {
+                if ((!Objects.equals(email, "") && !Objects.equals(password, "") &&
+                        (email.equals(usernameLogin) && password.equals(passwordLogin)))) {
 
                     frame.dispose();
                     mainWindow.runMainWindow();
@@ -117,13 +140,11 @@ public class LoginWindow {
                     String message = "Text fields are empty or \n Wrong username and password";
                     JOptionPane.showMessageDialog(loginPanel, message);
                 }
-
-
             }
         });
     }
 
-    private void Resign(){
+    private void Resign() {
 
         resignButton.addActionListener(new ActionListener() {
             @Override
@@ -131,32 +152,48 @@ public class LoginWindow {
 
                 getTextFromTextField(usernameInput, passwordInput);
 
-                if (!username.isEmpty() && !password.isEmpty()){
+                if (!email.isEmpty() && !password.isEmpty()) {
 
                     account = new ArrayList<>();
 
-                    //TODO have a regex to remove unwanted characters
-                    account.add(username);
-                    account.add(password);
-
-                    //TODO Don't override content in env file
-                    if (!envFile.exists()){
+                    if (isValidEmail(email) && isValidPassword(password)) {
+                        account.add(email);
+                        account.add(password);
                         fileHandler.EnvEditor(account, frame);
-                    }else {
-                        JOptionPane.showMessageDialog(frame, "under progress");
+                    } else {
+                        System.out.println("The email or password is not valid");
                     }
-
-                }else {
+                } else {
                     JOptionPane.showMessageDialog(frame, "ERROR: The fields are empty !");
                 }
-
-
             }
         });
     }
 
-    private void getTextFromTextField(JTextField usernameInput, JTextField passwordInput){
-        username = usernameInput.getText();
+    public static boolean isValidEmail(String email) {
+        String regex = "^[a-zA-Z0-9+_,-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+
+        Pattern pattern = Pattern.compile(regex);
+
+        Matcher matcher = pattern.matcher(email);
+
+        //System.out.println(email.matches(regex));
+
+        return matcher.matches();
+    }
+
+    public static boolean isValidPassword(String passwordInput) {
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+=-]).{8,}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(passwordInput);
+
+        //System.out.println(passwordInput.matches(regex));
+
+        return matcher.matches();
+    }
+
+    private void getTextFromTextField(JTextField usernameInput, JTextField passwordInput) {
+        email = usernameInput.getText();
         password = passwordInput.getText();
     }
 }
