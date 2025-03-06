@@ -167,7 +167,7 @@ public class LoginWindow {
                     if (isValidEmail(email) && isValidPassword(password)) {
                         account.add(email);
                         account.add(password);
-                        JOptionPane.showMessageDialog(frame, "Try now to login");
+                        JOptionPane.showMessageDialog(frame, "Your account has been created");
                         fileHandler.EnvEditor(account, frame);
                     } else {
                         System.out.println("The email or password is not valid");
