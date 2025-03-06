@@ -40,7 +40,6 @@ public class LoginWindow {
     private String password;
 
     private JTextField usernameInput;
-    //private JTextField passwordInput;
     private JPasswordField passwordInput;
 
     private JButton loginButton = new JButton("Login");
@@ -57,44 +56,46 @@ public class LoginWindow {
 
     public void RunWindow() {
 
-        if (!Files.exists(Path.of(fullPath))) {
-            try {
-                if (envFile.createNewFile()) {
-                    System.out.println("The file has been created");
+        if (Files.exists(Path.of(fullPath))) {
+
+            frame.dispose();
+            mainWindow.runMainWindow();
+
+        } else if (!Files.exists(Path.of(fullPath))){
+
+            try{
+
+            frame.setSize(800, 800);
+
+            emailLabel = new JLabel("Email: ");
+            usernameInput = new JTextField(20);
+
+            passwordLabel = new JLabel("Password: ");
+            passwordInput = new JPasswordField(20);
+
+            obsLabel = new JLabel("<html>*OBS: password need <br> -least one digit " +
+                    "<br> -least one lowercase and uppercase letter <br> -least one special character (@#$%^&+=!_) " +
+                    "<br> -no whitespace characters <br> -total length least 8 characters</html>");
+
+            obsLabel.setFont(new Font("Arial", Font.BOLD, 12));
+
+                if (envFile.createNewFile()){
+
+                    ContentInTheWindow(usernameInput, passwordInput, obsLabel);
+
+                    ButtonAction(usernameInput, passwordInput);
+
+                    Resign();
                 }
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(frame, "Failed to create the file");
-                System.exit(0);
+
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+
+            }catch (IOException e) {
+                JOptionPane.showMessageDialog(frame, "Did not create the file");
             }
         }
-
-        frame.setSize(800, 800);
-
-        emailLabel = new JLabel("Email: ");
-        usernameInput = new JTextField(20);
-
-        passwordLabel = new JLabel("Password: ");
-        passwordInput = new JPasswordField(20);
-
-        obsLabel = new JLabel("<html>*OBS: password need <br> -least one digit " +
-                "<br> -least one lowercase and uppercase letter <br> -least one special character (@#$%^&+=!_) " +
-                "<br> -no whitespace characters <br> -total length least 8 characters</html>");
-
-        obsLabel.setFont(new Font("Arial", Font.BOLD, 12));
-
-
-        ContentInTheWindow(usernameInput, passwordInput, obsLabel);
-
-        ButtonAction(usernameInput, passwordInput);
-
-        Resign();
-
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
-
     }
 
     private void ContentInTheWindow(JTextField usernameInput, JTextField passwordInput, JLabel obsLabel) {
@@ -131,6 +132,7 @@ public class LoginWindow {
                 String usernameLogin = dotenv.get("USERNAME_LOGIN");
                 String passwordLogin = dotenv.get("PASSWORD_LOGIN");
 
+                // checks if email and password it's right
                 if ((!Objects.equals(email, "") && !Objects.equals(password, "") &&
                         (email.equals(usernameLogin) && password.equals(passwordLogin)))) {
 
@@ -159,6 +161,7 @@ public class LoginWindow {
                     if (isValidEmail(email) && isValidPassword(password)) {
                         account.add(email);
                         account.add(password);
+                        JOptionPane.showMessageDialog(frame, "Try now to login");
                         fileHandler.EnvEditor(account, frame);
                     } else {
                         System.out.println("The email or password is not valid");
