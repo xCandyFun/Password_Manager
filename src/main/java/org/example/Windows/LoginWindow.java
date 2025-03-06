@@ -56,7 +56,13 @@ public class LoginWindow {
 
     public void RunWindow() {
 
-        if (Files.exists(Path.of(fullPath))) {
+        // check if the usb is in
+        if (!Files.exists(Path.of(filePath))){
+
+            JOptionPane.showMessageDialog(frame, "USB is NOT connected");
+            System.exit(1);
+
+        }else if (Files.exists(Path.of(fullPath))) {
 
             frame.dispose();
             mainWindow.runMainWindow();
