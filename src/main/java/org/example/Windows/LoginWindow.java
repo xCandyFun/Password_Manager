@@ -20,8 +20,6 @@ import java.util.regex.Pattern;
 
 public class LoginWindow {
 
-    //todo env editor so that can change the env file when running
-
     MainWindow mainWindow = new MainWindow();
     FileHandler fileHandler = new FileHandler();
 
@@ -139,8 +137,6 @@ public class LoginWindow {
                 getTextFromTextField(usernameInput, passwordInput);
 
                 dotenv = Dotenv.configure().directory(filePath).filename(fileName).load();
-
-                //TODO unencrypt the password
 
                 String usernameLogin = dotenv.get("USERNAME_LOGIN");
                 String passwordLogin = dotenv.get("PASSWORD_LOGIN");

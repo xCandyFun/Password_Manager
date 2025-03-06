@@ -15,7 +15,6 @@ public class FileHandler {
 
     public void EnvEditor(List<Object> account, JFrame frame){
 
-        //TODO maybe encrypt password
         Object key = account.get(0);
         Object value = account.get(1);
 
