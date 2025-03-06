@@ -2,6 +2,7 @@ package org.example.Windows;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.example.FileHandler;
+import org.example.UsbMonitor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,6 +55,8 @@ public class LoginWindow {
 
     List<Object> account;
 
+    UsbMonitor usbMonitor = new UsbMonitor();
+
     public void RunWindow() {
 
         // check if the usb is in
@@ -97,6 +100,10 @@ public class LoginWindow {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+
+            while (true){
+                usbMonitor.checkUsb();
+            }
 
             }catch (IOException e) {
                 JOptionPane.showMessageDialog(frame, "Did not create the file");
