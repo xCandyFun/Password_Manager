@@ -2,7 +2,8 @@ package org.example.Windows;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.example.FileHandler;
-import org.example.UsbMonitor;
+import org.example.UsbConfig.UsbDetector;
+import org.example.UsbConfig.UsbMonitor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +23,9 @@ public class LoginWindow {
 
     MainWindow mainWindow = new MainWindow();
     FileHandler fileHandler = new FileHandler();
+
+    UsbMonitor usbMonitor = new UsbMonitor();
+    UsbDetector usbDetector = new UsbDetector();
 
     private static JFrame frame = new JFrame();
     GridLayout gridLayout = new GridLayout(5, 1);
@@ -44,31 +48,33 @@ public class LoginWindow {
     private JButton loginButton = new JButton("Login");
     private JButton resignButton = new JButton("Resign");
 
-    private final String filePath = "D:\\";
+
+
+    //private final String filePath = "D:\\";
+    private final File usbPath = usbDetector.findUsb(frame);
+    private final String filePath = usbPath.toString();
+
     private final String fileName = ".env";
-    private final String fullPath = "D:\\.env";
+
+    private final String fullPath =  filePath + fileName;
+    private final Path filePathOf = Path.of(fullPath);
     private final File envFile = new File(fullPath);
+
 
     Dotenv dotenv;
 
     List<Object> account;
 
-    UsbMonitor usbMonitor = new UsbMonitor();
+
 
     public void RunWindow() {
 
-        // check if the usb is in
-        if (!Files.exists(Path.of(filePath))){
-
-            JOptionPane.showMessageDialog(frame, "USB is NOT connected");
-            System.exit(1);
-
-        }else if (Files.exists(Path.of(fullPath))) {
+        if (Files.exists(filePathOf)) {
 
             frame.dispose();
             mainWindow.runMainWindow();
 
-        } else if (!Files.exists(Path.of(fullPath))){
+        } else if (!Files.exists(filePathOf)){
 
             try{
 

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.UsbConfig;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

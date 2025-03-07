@@ -1,10 +1,8 @@
 package org.example.Windows;
 
-import org.example.UsbMonitor;
+import org.example.UsbConfig.UsbMonitor;
 
 import javax.swing.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class MainWindow {
 
