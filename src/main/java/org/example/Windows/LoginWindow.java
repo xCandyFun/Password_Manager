@@ -27,7 +27,7 @@ public class LoginWindow {
     UsbMonitor usbMonitor = new UsbMonitor();
     UsbDetector usbDetector = new UsbDetector();
 
-    private static JFrame frame = new JFrame();
+    public static JFrame frame = new JFrame();
     GridLayout gridLayout = new GridLayout(5, 1);
 
     private JPanel loginPanel = new JPanel(gridLayout);
@@ -71,6 +71,8 @@ public class LoginWindow {
 
         if (Files.exists(filePathOf)) {
 
+            fileHandler.envChecker(frame);
+
             frame.dispose();
             mainWindow.runMainWindow();
 
@@ -92,6 +94,7 @@ public class LoginWindow {
 
             obsLabel.setFont(new Font("Arial", Font.BOLD, 12));
 
+                //TODO NEED TO LOOK WHEN .env IS CREATED
                 if (envFile.createNewFile()){
 
                     ContentInTheWindow(usernameInput, passwordInput, obsLabel);

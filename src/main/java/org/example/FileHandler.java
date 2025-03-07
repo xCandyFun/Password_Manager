@@ -1,14 +1,26 @@
 package org.example;
 
+import org.example.UsbConfig.UsbDetector;
+import org.example.Windows.LoginWindow;
+
 import javax.swing.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class FileHandler {
 
-    private final String envPath = "D:\\.env";
+    UsbDetector usbDetector = new UsbDetector();
+
+    private final File usbPath = usbDetector.findUsb(LoginWindow.frame);
+    private final String fileName = ".env";
+    private final String fullPath = usbPath.toString() + fileName;
+    private final String envPath = fullPath;
     private final File envFile = new File(envPath);
     private final Map<Object, Object> envMapUsername = new HashMap<>();
     private final Map<Object, Object> envMapPassword = new HashMap<>();
@@ -59,5 +71,36 @@ public class FileHandler {
         }catch (IOException e){
             System.out.println("Filed to save to file: " + e);
         }
+    }
+
+    public void envChecker(JFrame frame){
+
+        if (isEnvEmpty(envPath, frame)) {
+            System.out.println("Error: .env file is empty! Closing application.");
+            System.exit(1);
+        }
+
+
+    }
+
+    private boolean isEnvEmpty(String envPathFile, JFrame frame) {
+        Path path = Paths.get(envPathFile);
+
+        try(Stream<String> lines = Files.lines(path)) {
+
+            boolean hasContent = lines.anyMatch(line -> line.trim().matches("^[a-zA-Z_]+\\s*.*$"));
+
+            if (!hasContent) {
+                Files.delete(path);
+                JOptionPane.showMessageDialog(frame, "Deleted empty .env file.");
+                return true;
+            }
+            //return lines.noneMatch(line -> line.trim().matches("^[a-zA-Z_]+\\s*.*$"));
+        }catch (IOException e) {
+            System.out.println("File doesn't exist or can't be read");
+            return true;
+        }
+
+        return false;
     }
 }
