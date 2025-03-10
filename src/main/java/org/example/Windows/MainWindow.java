@@ -8,8 +8,6 @@ public class MainWindow {
 
     JFrame frame = new JFrame();
 
-    private final String filePath = "D:\\";
-
     UsbMonitor usbMonitor = new UsbMonitor();
 
     public void runMainWindow() {
@@ -17,6 +15,8 @@ public class MainWindow {
         frame.setSize(800, 800);
 
         //TODO Time for save,encrypt,display and copy for logins
+
+        //but not today
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
