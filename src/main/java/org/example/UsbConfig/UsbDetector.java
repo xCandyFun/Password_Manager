@@ -15,7 +15,7 @@ public class UsbDetector {
     public void listAllDrives() {
         System.out.println("Detected drives:");
 
-        for (File root : roots){
+        for (File root : roots) {
             System.out.println(root.getAbsoluteFile() + " - " + fileSystemView.getSystemTypeDescription(root));
         }
 

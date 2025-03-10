@@ -53,7 +53,7 @@ public class LoginWindow {
 
     private final String fileName = ".env";
 
-    private final String fullPath =  filePath + fileName;
+    private final String fullPath = filePath + fileName;
     private final Path filePathOf = Path.of(fullPath);
     private final File envFile = new File(fullPath);
 
@@ -63,38 +63,37 @@ public class LoginWindow {
     List<Object> account;
 
 
-
     public void RunWindow() {
 
         if (Files.exists(filePathOf)) {
 
-            if (Files.exists(filePathOf)){
+            if (Files.exists(filePathOf)) {
                 fileHandler.envChecker(frame);
             }
 
             frame.dispose();
             mainWindow.runMainWindow();
 
-        } else if (!Files.exists(filePathOf)){
+        } else if (!Files.exists(filePathOf)) {
 
-            try{
+            try {
 
-            frame.setSize(800, 800);
+                frame.setSize(800, 800);
 
-            emailLabel = new JLabel("Email: ");
-            usernameInput = new JTextField(20);
+                emailLabel = new JLabel("Email: ");
+                usernameInput = new JTextField(20);
 
-            passwordLabel = new JLabel("Password: ");
-            passwordInput = new JPasswordField(20);
+                passwordLabel = new JLabel("Password: ");
+                passwordInput = new JPasswordField(20);
 
-            obsLabel = new JLabel("<html>*OBS: password need <br> -least one digit " +
-                    "<br> -least one lowercase and uppercase letter <br> -least one special character (@#$%^&+=!_) " +
-                    "<br> -no whitespace characters <br> -total length least 8 characters</html>");
+                obsLabel = new JLabel("<html>*OBS: password need <br> -least one digit " +
+                        "<br> -least one lowercase and uppercase letter <br> -least one special character (@#$%^&+=!_) " +
+                        "<br> -no whitespace characters <br> -total length least 8 characters</html>");
 
-            obsLabel.setFont(new Font("Arial", Font.BOLD, 12));
+                obsLabel.setFont(new Font("Arial", Font.BOLD, 12));
 
                 //TODO NEED TO LOOK WHEN .env IS CREATED
-                if (envFile.createNewFile()){
+                if (envFile.createNewFile()) {
 
                     ContentInTheWindow(usernameInput, passwordInput, obsLabel);
 
@@ -103,15 +102,15 @@ public class LoginWindow {
                     Resign();
                 }
 
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
 
-            while (true){
-                usbMonitor.checkUsb();
-            }
+                while (true) {
+                    usbMonitor.checkUsb();
+                }
 
-            }catch (IOException e) {
+            } catch (IOException e) {
                 JOptionPane.showMessageDialog(frame, "Did not create the file");
             }
         }
