@@ -48,9 +48,6 @@ public class LoginWindow {
     private JButton loginButton = new JButton("Login");
     private JButton resignButton = new JButton("SignUp");
 
-
-
-    //private final String filePath = "D:\\";
     private final File usbPath = usbDetector.findUsb(frame);
     private final String filePath = usbPath.toString();
 
@@ -71,7 +68,9 @@ public class LoginWindow {
 
         if (Files.exists(filePathOf)) {
 
-            fileHandler.envChecker(frame);
+            if (Files.exists(filePathOf)){
+                fileHandler.envChecker(frame);
+            }
 
             frame.dispose();
             mainWindow.runMainWindow();
@@ -198,8 +197,6 @@ public class LoginWindow {
 
         Matcher matcher = pattern.matcher(email);
 
-        //System.out.println(email.matches(regex));
-
         return matcher.matches();
     }
 
@@ -207,8 +204,6 @@ public class LoginWindow {
         String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+=-]).{8,}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(passwordInput);
-
-        //System.out.println(passwordInput.matches(regex));
 
         return matcher.matches();
     }

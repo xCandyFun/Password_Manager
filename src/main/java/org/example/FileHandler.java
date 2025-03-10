@@ -1,5 +1,6 @@
 package org.example;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.example.UsbConfig.UsbDetector;
 import org.example.Windows.LoginWindow;
 
@@ -25,7 +26,9 @@ public class FileHandler {
     private final Map<Object, Object> envMapUsername = new HashMap<>();
     private final Map<Object, Object> envMapPassword = new HashMap<>();
 
-    public void EnvEditor(List<Object> account, JFrame frame){
+    Dotenv dotenv;
+
+    public void EnvEditor(List<Object> account, JFrame frame) {
 
         Object key = account.get(0);
         Object value = account.get(1);
@@ -35,15 +38,15 @@ public class FileHandler {
 
         long isEmpty = 0;
 
-        if (envFile.length() == isEmpty){
-            SaveEnvFile(account,frame);
-        }else {
+        if (envFile.length() == isEmpty) {
+            SaveEnvFile(account, frame);
+        } else {
             JOptionPane.showMessageDialog(frame, "ERROR: The file has content");
         }
 
     }
 
-    private void SaveEnvFile(List<Object> account, JFrame frame){
+    private void SaveEnvFile(List<Object> account, JFrame frame) {
 
         Object keyUsername = "USERNAME_LOGIN";
         Object valueUsername = account.get(0);
@@ -51,29 +54,29 @@ public class FileHandler {
         Object keyPassword = "PASSWORD_LOGIN";
         Object valuePassword = account.get(1);
 
-        if ((keyUsername.equals("") || valueUsername.equals("")) && (keyPassword.equals("") || valuePassword.equals(""))){
-            JOptionPane.showMessageDialog(frame,"Key and Value cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+        if ((keyUsername.equals("") || valueUsername.equals("")) && (keyPassword.equals("") || valuePassword.equals(""))) {
+            JOptionPane.showMessageDialog(frame, "Key and Value cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         envMapUsername.put(keyUsername, valueUsername);
         envMapPassword.put(keyPassword, valuePassword);
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(envPath))){
-            for (Map.Entry<Object, Object> entry : envMapUsername.entrySet()){
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(envPath))) {
+            for (Map.Entry<Object, Object> entry : envMapUsername.entrySet()) {
                 writer.write(entry.getKey() + " = " + entry.getValue());
                 writer.newLine();
             }
-            for (Map.Entry<Object, Object> entry : envMapPassword.entrySet()){
+            for (Map.Entry<Object, Object> entry : envMapPassword.entrySet()) {
                 writer.write(entry.getKey() + " = " + entry.getValue());
                 writer.newLine();
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Filed to save to file: " + e);
         }
     }
 
-    public void envChecker(JFrame frame){
+    public void envChecker(JFrame frame) {
 
         if (isEnvEmpty(envPath, frame)) {
             System.out.println("Error: .env file is empty! Closing application.");
@@ -84,22 +87,28 @@ public class FileHandler {
     }
 
     private boolean isEnvEmpty(String envPathFile, JFrame frame) {
+
+        dotenv = Dotenv.configure().directory(usbPath.toString()).filename(fileName).load();
+
+        String username = dotenv.get("USERNAME_LOGIN");
+        String password = dotenv.get("PASSWORD_LOGIN");
+
         Path path = Paths.get(envPathFile);
 
-        try(Stream<String> lines = Files.lines(path)) {
+        try (Stream<String> lines = Files.lines(path)) {
 
             boolean hasContent = lines.anyMatch(line -> line.trim().matches("^[a-zA-Z_]+\\s*.*$"));
 
-            if (!hasContent) {
+            if (!hasContent || username == null || password == null) {
                 Files.delete(path);
                 JOptionPane.showMessageDialog(frame, "Deleted empty .env file.");
                 return true;
             }
-            //return lines.noneMatch(line -> line.trim().matches("^[a-zA-Z_]+\\s*.*$"));
-        }catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("File doesn't exist or can't be read");
             return true;
         }
+
 
         return false;
     }

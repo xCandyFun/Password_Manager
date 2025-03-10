@@ -25,7 +25,6 @@ public class UsbDetector {
 
         for (File root : roots) {
             String description = fileSystemView.getSystemTypeDescription(root);
-            //System.out.println("Checking: " + root.getAbsolutePath() + " - " + description);
 
             if (fileSystemView.isDrive(root) && description != null &&
                     (description.toLowerCase().contains("removable") || description.toLowerCase().contains("usb drive"))) {
