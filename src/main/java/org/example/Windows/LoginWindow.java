@@ -46,7 +46,7 @@ public class LoginWindow {
     private JPasswordField passwordInput;
 
     private JButton loginButton = new JButton("Login");
-    private JButton resignButton = new JButton("Resign");
+    private JButton resignButton = new JButton("SignUp");
 
 
 
