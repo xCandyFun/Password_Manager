@@ -22,12 +22,5 @@ public class ShowAllAccountsWindow {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        checkUsb();
-    }
-
-    private void checkUsb(){
-        while (true){
-            usbMonitor.checkUsb();
-        }
     }
 }

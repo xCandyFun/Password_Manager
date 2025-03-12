@@ -106,9 +106,9 @@ public class LoginWindow {
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
 
-                while (true) {
-                    usbMonitor.checkUsb();
-                }
+//                while (true) {
+//                    usbMonitor.checkUsb();
+//                }
 
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(frame, "Did not create the file");

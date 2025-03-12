@@ -10,28 +10,26 @@ import java.awt.event.ActionListener;
 public class MainWindow {
 
     UsbMonitor usbMonitor = new UsbMonitor();
-    NewAccountWindow newAccountWindow = new NewAccountWindow();
+    private NewAccountWindow newAccountWindow;
     ShowAllAccountsWindow showAllAccountsWindow = new ShowAllAccountsWindow();
 
-    JFrame frame = new JFrame();
-
-    int width = 800, height = 800;
+    JFrame frame;
 
     GridLayout gridLayout = new GridLayout(10,0);
 
-    Panel menu = new Panel(gridLayout);
+    private final int width = 800, height = 800;
+
+    Panel menu;
 
     Button addNewAccount;
     Button showAllAccounts;
 
+    public MainWindow(){
+        newAccountWindow = new NewAccountWindow(this);
 
-    public void runMainWindow() {
+        frame = new JFrame();
 
-
-        //TODO Time for save,encrypt,display and copy for logins
-
-        //but not today
-        //but today
+        menu = new Panel(gridLayout);
 
         addNewAccount = new Button("ADD NEW ACCOUNT");
         showAllAccounts = new Button("SHOW ALL ACCOUNTS"); // copy and delete inside show all accounts
@@ -41,13 +39,28 @@ public class MainWindow {
 
         frame.add(menu);
 
-        actionButtonForAddNew();
-        actionButtonShowAll();
+
 
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+    }
+
+
+
+
+    public void runMainWindow() {
+
+        //TODO Time for save,encrypt,display and copy for logins
+
+        actionButtonForAddNew();
+        actionButtonShowAll();
+
+
+
+
 
         while (true) {
             usbMonitor.checkUsb();
@@ -60,7 +73,8 @@ public class MainWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                frame.dispose();
+                //frame.dispose();
+                frame.setVisible(false );
 
                 newAccountWindow.run();
 
