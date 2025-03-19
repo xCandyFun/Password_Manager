@@ -1,6 +1,10 @@
 package org.example.Windows;
 
 
+import org.example.DataTransform.AWS_KMS_EncryptData;
+import org.example.DataTransform.EncryptData;
+
+import javax.crypto.SecretKey;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,6 +16,9 @@ import java.util.List;
 public class NewAccountWindow {
 
     private MainWindow mainWindow;
+
+    AWS_KMS_EncryptData awsKmsEncryptData = new AWS_KMS_EncryptData();
+    EncryptData encryptData = new EncryptData();
 
     JFrame frame;
 
@@ -39,6 +46,9 @@ public class NewAccountWindow {
     JButton sendButton;
 
     List<String> accountInfo = new ArrayList<>();
+
+    //TODO get the data from usb
+    String masterPassword;
 
 
     public NewAccountWindow(MainWindow mainWindow){
@@ -68,6 +78,9 @@ public class NewAccountWindow {
     }
 
     public void run(){
+
+        //awsKmsEncryptData.encryptMasterPassword();
+
 
         placeholderLayout();
 
@@ -181,7 +194,12 @@ public class NewAccountWindow {
                 //TODO call encrypt class to encrypt the data in the List
                 //call the class that take care of the database
 
+
             }
         });
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }
