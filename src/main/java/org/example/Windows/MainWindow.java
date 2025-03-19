@@ -1,5 +1,8 @@
 package org.example.Windows;
 
+import org.example.ConnectToDB.ConnectDynamoDB;
+import org.example.ConnectToDB.DynamodbHelper;
+import org.example.DataTransform.AWS_KMS_EncryptData;
 import org.example.UsbConfig.UsbMonitor;
 
 import javax.swing.*;
@@ -12,6 +15,9 @@ public class MainWindow {
     UsbMonitor usbMonitor = new UsbMonitor();
     private NewAccountWindow newAccountWindow;
     ShowAllAccountsWindow showAllAccountsWindow = new ShowAllAccountsWindow();
+    ConnectDynamoDB connectDynamoDB = new ConnectDynamoDB();
+    DynamodbHelper dynamodbHelper = new DynamodbHelper();
+    AWS_KMS_EncryptData awsKmsEncryptData = new AWS_KMS_EncryptData();
 
     JFrame frame;
 
@@ -93,4 +99,5 @@ public class MainWindow {
             }
         });
     }
+
 }
