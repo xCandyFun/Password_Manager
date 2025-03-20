@@ -11,14 +11,19 @@ public class Main {
     static DynamodbHelper dynamodbHelper = new DynamodbHelper();
 
     public static void main(String[] args) {
-        connectToDynamoDb();
-        loginWindow.RunWindow();
+        if (connectToDynamoDb()){
+            loginWindow.RunWindow();
+        }
     }
 
-    private static void connectToDynamoDb(){
+    private static Boolean connectToDynamoDb(){
         String encryptedMasterKey = awsKmsEncryptData.encryptMasterPassword();
         //connectDynamoDB.storeEncryptedPassword(encryptedMasterKey);
-        dynamodbHelper.saveEncryptedMasterKey(encryptedMasterKey);
+        if (dynamodbHelper.saveEncryptedMasterKey(encryptedMasterKey)){
+            return true;
+        } else {
+            throw new RuntimeException();
+        }
 
     }
 }

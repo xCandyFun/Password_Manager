@@ -36,10 +36,7 @@ public class DynamodbHelper {
                 .build();
     }
 
-
-    public void saveEncryptedMasterKey(String encryptedPassword){
-
-        System.out.println(userUUID);
+    public boolean saveEncryptedMasterKey(String encryptedPassword){
 
         GetItemRequest getItemRequest = GetItemRequest.builder()
                 .tableName(tableName)
@@ -55,12 +52,15 @@ public class DynamodbHelper {
             if (!existingEncryptedPassword.equals(encryptedPassword)) {
                 updateEncryptedKey(dynamoDbClient, userUUID, encryptedPassword);
                 System.out.println("Update key");
+                return true;
             } else {
                 System.out.println("Password hasn't changed. No update required.");
+                return false;
             }
         } else {
             insertEncryptedKey(dynamoDbClient, userUUID, encryptedPassword);
             System.out.println("Added new key");
+            return true;
         }
     }
 
