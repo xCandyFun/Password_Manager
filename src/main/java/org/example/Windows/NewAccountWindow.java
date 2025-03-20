@@ -79,9 +79,6 @@ public class NewAccountWindow {
 
     public void run(){
 
-        //awsKmsEncryptData.encryptMasterPassword();
-
-
         placeholderLayout();
 
         actionButtonGoBack();
@@ -193,6 +190,8 @@ public class NewAccountWindow {
 
                 //TODO call encrypt class to encrypt the data in the List
                 //call the class that take care of the database
+
+                encryptData.getEncryptedKey(accountInfo);
 
 
             }

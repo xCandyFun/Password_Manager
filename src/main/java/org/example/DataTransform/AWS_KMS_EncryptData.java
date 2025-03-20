@@ -16,6 +16,7 @@ import java.awt.*;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Map;
 
 public class AWS_KMS_EncryptData {
 
@@ -41,6 +42,7 @@ public class AWS_KMS_EncryptData {
             EncryptRequest encryptRequest = EncryptRequest.builder()
                     .keyId(KMSKeyId)
                     .plaintext(plaintextByte)
+                    .encryptionContext(Map.of("Id", "MasterKey"))
                     .build();
 
             EncryptResponse encryptResponse = kmsClient.encrypt(encryptRequest);

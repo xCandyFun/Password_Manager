@@ -1,5 +1,7 @@
 package org.example.DataTransform;
 
+import org.example.ConnectToDB.DynamodbHelper;
+
 import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -14,7 +16,8 @@ import java.util.Base64;
 import java.util.List;
 
 public class EncryptData {
-    AWS_KMS_EncryptData awsKms = new AWS_KMS_EncryptData();
+    DynamodbHelper dynamodbHelper = new DynamodbHelper();
+
     AWS_KMS_DecryptData awsKmsDecryptData = new AWS_KMS_DecryptData();
 
     //TODO text time encrypt the data
@@ -24,20 +27,26 @@ public class EncryptData {
     private static final int iterationCount = 1000;
     private static final int keyLength = 256;
 
-    String masterPassword = "TEST";
-    //The encrypted password is returned in Base64 format, so it can be safely stored (in a database, for example).
-    //String encryptedPassword = awsKms.encryptMasterPassword(masterPassword);
 
-    // Example: Simulate retrieving encrypted password from DynamoDB
-    String encryptedPasswordBase64 = "TEST";
 
-    // Decrypt the password
-    //String decryptedPassword = awsKmsDecryptData.decryptMasterPassword(encryptedPasswordBase64);
+
+
+    public void getEncryptedKey(List<String> accountInfo){
+
+        // get encrypted key
+        String encryptedMasterKey = dynamodbHelper.getEncryptedKey();
+
+        //decrypted key
+        String decryptedMasterKey = awsKmsDecryptData.decryptMasterPassword(encryptedMasterKey);
+
+        storeAccountData(accountInfo, decryptedMasterKey);
+
+    }
 
     // Method to generate the encryption key from the master password and salt
-    public static SecretKey deriveKey(String password, String salt){
+    public static SecretKey deriveKey(String masterPassword, String salt){
         try {
-            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(),
+            PBEKeySpec spec = new PBEKeySpec(masterPassword.toCharArray(), salt.getBytes(),
                     iterationCount, keyLength);
 
             SecretKeyFactory factory = SecretKeyFactory.getInstance(pbkAlgorithm);
@@ -52,9 +61,9 @@ public class EncryptData {
     }
 
     // Encrypt the account info using the master password and salt
-    public String encryptList(List<String> accountInfo, String password, String salt) {
+    public String encryptList(List<String> accountInfo, String masterPassword, String salt) {
         try {
-            SecretKey key = deriveKey(password, salt);
+            SecretKey key = deriveKey(masterPassword, salt);
             Cipher cipher = Cipher.getInstance(algorithm);
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
@@ -76,20 +85,21 @@ public class EncryptData {
     }
 
     // Store encrypted account data (and salt) in a secure way
-    private void storeAccountData(List<String> accountInfo, String password) {
+    private void storeAccountData(List<String> encryptedAccountInfoList, String masterPassword) {
 
         try {
 
             String salt = generateSalt();
 
-            String encyptedData = encryptList(accountInfo, password, salt);
+            String encryptedData = encryptList(encryptedAccountInfoList, masterPassword, salt);
 
-            List<String> encyptedDataAndSalt = new ArrayList<>();
+            List<String> encryptedDataAndSalt = new ArrayList<>();
 
-            encyptedDataAndSalt.add(encyptedData);
-            encyptedDataAndSalt.add(salt);
+            encryptedDataAndSalt.add(encryptedData);
+            encryptedDataAndSalt.add(salt);
 
             // Store the encrypted data and salt (in DynamoDB, database, or secure storage)
+            dynamodbHelper.insertEncryptedAccountInfo(encryptedDataAndSalt);
 
 
         } catch (Exception e) {

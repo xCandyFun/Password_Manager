@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.ConnectToDB.DynamodbHelper;
 import org.example.DataTransform.AWS_KMS_EncryptData;
+import org.example.DataTransform.EncryptData;
 import org.example.Windows.LoginWindow;
 
 public class Main {
@@ -10,7 +11,10 @@ public class Main {
     static  AWS_KMS_EncryptData awsKmsEncryptData = new AWS_KMS_EncryptData();
     static DynamodbHelper dynamodbHelper = new DynamodbHelper();
 
+    static EncryptData encryptData = new EncryptData();
+
     public static void main(String[] args) {
+        //encryptData.getEncryptedKey();
         if (connectToDynamoDb()){
             loginWindow.RunWindow();
         }

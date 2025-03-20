@@ -8,10 +8,11 @@ import software.amazon.awssdk.services.dynamodb.model.*;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class DynamodbHelper {
-
 
     private final DynamoDbClient dynamoDbClient;
 
@@ -26,7 +27,11 @@ public class DynamodbHelper {
 
     String userUUID = dotenv.get("USER_UUID");
 
+    UUID accountsUUID = UUID.randomUUID();
+
     private final String tableName = "MasterKeyEncrypted";
+
+    private final String tableNameAccounts = "AccountsInfo";
 
     public DynamodbHelper(){
         this.dynamoDbClient = DynamoDbClient.builder()
@@ -50,6 +55,7 @@ public class DynamodbHelper {
             if (!existingEncryptedPassword.equals(encryptedPassword)) {
                 updateEncryptedKey(dynamoDbClient, userUUID, encryptedPassword);
                 System.out.println("Update key");
+                getEncryptedKey();
                 return true;
             } else {
                 System.out.println("Password hasn't changed. No update required.");
@@ -83,6 +89,41 @@ public class DynamodbHelper {
                 .expressionAttributeValues(Map.of(":encryptedPassword", AttributeValue.builder().s(encryptedPassword).build()))
                 .build();
         dynamoDbClient.updateItem(updateItemRequest);
+    }
+
+    public String getEncryptedKey(){
+
+        GetItemRequest getItemRequest = GetItemRequest.builder()
+                .tableName(tableName)
+                .key(Map.of("Id", AttributeValue.builder().s(userUUID).build()))
+                .build();
+
+        GetItemResponse getItemResponse = dynamoDbClient.getItem(getItemRequest);
+
+        Map<String, AttributeValue> item = getItemResponse.item();
+
+        if (item != null && item.containsKey("EncryptedPassword")){
+            return item.get("EncryptedPassword").s();
+        }else {
+            return null;
+        }
+
+    }
+
+    public void insertEncryptedAccountInfo(List<String> encryptedDataAndSalt){
+
+        String encryptedData = encryptedDataAndSalt.get(0);
+        String encryptedSalt = encryptedDataAndSalt.get(1);
+
+        PutItemRequest putItemRequest = PutItemRequest.builder()
+                .tableName(tableNameAccounts)
+                .item(Map.of("Id", AttributeValue.builder().s(accountsUUID.toString()).build(),
+                        "EncryptedAccount", AttributeValue.builder().s(encryptedData).build(),
+                        "EncryptedSalt", AttributeValue.builder().s(encryptedSalt).build()
+                ))
+                .build();
+
+        dynamoDbClient.putItem(putItemRequest);
     }
 
 
