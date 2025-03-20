@@ -8,9 +8,7 @@ import software.amazon.awssdk.services.dynamodb.model.*;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class DynamodbHelper {
 
@@ -40,7 +38,7 @@ public class DynamodbHelper {
 
         GetItemRequest getItemRequest = GetItemRequest.builder()
                 .tableName(tableName)
-                .key(Map.of("Id", AttributeValue.builder().s(userUUID.toString()).build()))
+                .key(Map.of("Id", AttributeValue.builder().s(userUUID).build()))
                 .build();
 
         GetItemResponse getItemResponse = dynamoDbClient.getItem(getItemRequest);
@@ -68,7 +66,7 @@ public class DynamodbHelper {
 
         PutItemRequest putItemRequest = PutItemRequest.builder()
                 .tableName(tableName)
-                .item(Map.of("Id", AttributeValue.builder().s(userUUID.toString()).build(),
+                .item(Map.of("Id", AttributeValue.builder().s(userUUID).build(),
                         "EncryptedPassword", AttributeValue.builder().s(enencryptedPassword).build()
                 ))
                 .build();
@@ -80,7 +78,7 @@ public class DynamodbHelper {
 
         UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
                 .tableName(tableName)
-                .key(Map.of("Id", AttributeValue.builder().s(userUUID.toString()).build()))
+                .key(Map.of("Id", AttributeValue.builder().s(userUUID).build()))
                 .updateExpression("SET EncryptedPassword = :encryptedPassword")
                 .expressionAttributeValues(Map.of(":encryptedPassword", AttributeValue.builder().s(encryptedPassword).build()))
                 .build();
