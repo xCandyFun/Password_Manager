@@ -13,11 +13,8 @@ import java.awt.event.ActionListener;
 public class MainWindow {
 
     UsbMonitor usbMonitor = new UsbMonitor();
-    private NewAccountWindow newAccountWindow;
-    ShowAllAccountsWindow showAllAccountsWindow = new ShowAllAccountsWindow();
-    ConnectDynamoDB connectDynamoDB = new ConnectDynamoDB();
-    DynamodbHelper dynamodbHelper = new DynamodbHelper();
-    AWS_KMS_EncryptData awsKmsEncryptData = new AWS_KMS_EncryptData();
+    private final NewAccountWindow newAccountWindow;
+    private final ShowAllAccountsWindow showAllAccountsWindow;
 
     JFrame frame;
 
@@ -32,6 +29,7 @@ public class MainWindow {
 
     public MainWindow(){
         newAccountWindow = new NewAccountWindow(this);
+        showAllAccountsWindow = new ShowAllAccountsWindow(this);
 
         frame = new JFrame();
 
@@ -80,7 +78,7 @@ public class MainWindow {
             public void actionPerformed(ActionEvent e) {
 
                 //frame.dispose();
-                frame.setVisible(false );
+                frame.setVisible(false);
 
                 newAccountWindow.run();
 
@@ -93,7 +91,8 @@ public class MainWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                frame.dispose();
+                //frame.dispose();
+                frame.setVisible(false);
 
                 showAllAccountsWindow.run();
             }

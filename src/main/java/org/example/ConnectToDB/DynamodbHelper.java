@@ -8,6 +8,7 @@ import software.amazon.awssdk.services.dynamodb.model.*;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -124,6 +125,38 @@ public class DynamodbHelper {
                 .build();
 
         dynamoDbClient.putItem(putItemRequest);
+    }
+
+    public List<String> getEncryptedAccountInfo(){
+
+        List<Map<String, AttributeValue>> items = scanTable();
+
+        List<String> encryptedAccountList = new ArrayList<>();
+
+        for (Map<String, AttributeValue> item : items){
+
+            String Id = item.get("Id").s();
+            String encryptedAccount = item.get("EncryptedAccount").s();
+            String encryptedSalt = item.get("EncryptedSalt").s();
+
+            encryptedAccountList.add(Id);
+            encryptedAccountList.add(encryptedAccount);
+            encryptedAccountList.add(encryptedSalt);
+
+            return encryptedAccountList;
+
+        }
+
+        return null;
+    }
+
+    private List<Map<String, AttributeValue>> scanTable(){
+
+        ScanRequest scanRequest = ScanRequest.builder().tableName(tableNameAccounts).build();
+        ScanResponse scanResponse = dynamoDbClient.scan(scanRequest);
+
+        return scanResponse.items();
+
     }
 
 

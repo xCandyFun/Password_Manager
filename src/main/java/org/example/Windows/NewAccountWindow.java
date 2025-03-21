@@ -98,11 +98,11 @@ public class NewAccountWindow {
         Component[] components = new Component[totalCells];
 
         for (int i = 0; i < totalCells; i++) {
-            components[i] = new JLabel("TEST");
+            components[i] = new JLabel("");
         }
 
         // [Location on components]
-        // [4 * 4 + 1 is the 9 cell]
+        // [4 * 4 + 1 is the 16 cell]
 
         components[3 * 3] = accountToWhereLabel;
         components[3 * 3 + 1] = accountToWhereInput;
@@ -196,9 +196,5 @@ public class NewAccountWindow {
 
             }
         });
-    }
-
-    public JFrame getFrame() {
-        return frame;
     }
 }

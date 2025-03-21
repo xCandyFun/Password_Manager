@@ -14,6 +14,7 @@ public class Main {
     static EncryptData encryptData = new EncryptData();
 
     public static void main(String[] args) {
+        dynamodbHelper.getEncryptedAccountInfo();
         //encryptData.getEncryptedKey();
         if (connectToDynamoDb()){
             loginWindow.RunWindow();
