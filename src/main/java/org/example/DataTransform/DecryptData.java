@@ -3,11 +3,13 @@ package org.example.DataTransform;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.example.ConnectToDB.DynamodbHelper;
 import org.example.UsbConfig.UsbDetector;
+import software.amazon.awssdk.services.kms.endpoints.internal.Value;
 
 import javax.crypto.*;
 import javax.swing.*;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -29,20 +31,39 @@ public class DecryptData {
 
     Dotenv dotenv = Dotenv.configure().directory(filePath).filename(".env").load();
 
-    String encryptedAccountInfo = encryptedData.get(1);
-    String encryptedSalt = encryptedData.get(2);
     String masterPassword = dotenv.get("MASTER_PASSWORD");
+
+    private final int listSize = 3;
 
     // Decrypt the account info using the master password and salt
     public List<String> decryptData() {
         try {
+
+            if (encryptedData.isEmpty() || encryptedData.size() < listSize){
+                throw new IllegalStateException("DynamoDB returned an empty or incomplete list. Cannot decrypt data.");
+            }
+
+            String encryptedAccountInfo = encryptedData.get(1);
+            String encryptedSalt = encryptedData.get(2);
+
+            System.out.println("Encrypted Data (Decryption): " + encryptedAccountInfo);
+            System.out.println("Retrieved Salt (Decryption): " + encryptedSalt);
+
+            //NEED KEY FROM THE DATA BASE
             SecretKey key = EncryptData.deriveKey(masterPassword, encryptedSalt);
+
+            System.out.println("Derived Key (Decryption): " + Base64.getEncoder().encodeToString(key.getEncoded()));
+
             Cipher cipher = Cipher.getInstance(EncryptData.algorithm);
 
             cipher.init(Cipher.DECRYPT_MODE, key);
 
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedAccountInfo));
+            byte[] encryptedBytes = Base64.getDecoder().decode(encryptedAccountInfo);
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+
             String decryptedString = new String(decryptedBytes);
+
+            System.out.println("Decrypted data: " + decryptedString);
 
             return Arrays.asList(decryptedString.split(","));
 

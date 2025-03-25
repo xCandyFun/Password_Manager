@@ -28,9 +28,6 @@ public class EncryptData {
     private static final int keyLength = 256;
 
 
-
-
-
     public void getEncryptedKey(List<String> accountInfo){
 
         // get encrypted key
@@ -52,6 +49,8 @@ public class EncryptData {
             SecretKeyFactory factory = SecretKeyFactory.getInstance(pbkAlgorithm);
 
             byte[] derivedKey = factory.generateSecret(spec).getEncoded();
+
+            System.out.println("Derived Key (Encryption): " + Base64.getEncoder().encodeToString(derivedKey));
 
             return new SecretKeySpec(derivedKey, algorithm);
 
@@ -76,7 +75,10 @@ public class EncryptData {
 
             byte[] encryptedBytes = cipher.doFinal(inputBytes);
 
-            return Base64.getEncoder().encodeToString(encryptedBytes);
+            String encryptedData = Base64.getEncoder().encodeToString(encryptedBytes);
+
+            //return Base64.getEncoder().encodeToString(encryptedBytes);
+            return encryptedData;
 
         } catch (IOException | IllegalBlockSizeException | BadPaddingException | NoSuchAlgorithmException
                  | NoSuchPaddingException | InvalidKeyException e){
@@ -91,12 +93,16 @@ public class EncryptData {
 
             String salt = generateSalt();
 
+            System.out.println("Generated Salt (Encryption): " + salt);
+
             String encryptedData = encryptList(encryptedAccountInfoList, masterPassword, salt);
 
             List<String> encryptedDataAndSalt = new ArrayList<>();
 
             encryptedDataAndSalt.add(encryptedData);
             encryptedDataAndSalt.add(salt);
+
+            System.out.println(encryptedData);
 
             // Store the encrypted data and salt (in DynamoDB, database, or secure storage)
             dynamodbHelper.insertEncryptedAccountInfo(encryptedDataAndSalt);

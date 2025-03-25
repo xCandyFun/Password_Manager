@@ -143,11 +143,9 @@ public class DynamodbHelper {
             encryptedAccountList.add(encryptedAccount);
             encryptedAccountList.add(encryptedSalt);
 
-            return encryptedAccountList;
-
         }
 
-        return null;
+        return encryptedAccountList;
     }
 
     private List<Map<String, AttributeValue>> scanTable(){
