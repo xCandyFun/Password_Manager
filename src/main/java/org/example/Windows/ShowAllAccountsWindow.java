@@ -36,11 +36,6 @@ public class ShowAllAccountsWindow {
 
     private final int width = 800, height = 800;
 
-
-    //JButton sendButton;
-
-    List<String> accountInfo = new ArrayList<>();
-
     public ShowAllAccountsWindow(MainWindow mainWindow){
         this.mainWindow = mainWindow;
 
@@ -52,16 +47,16 @@ public class ShowAllAccountsWindow {
 
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        frame.setSize(width, height);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
     }
 
     public void run(){
 
         showData();
+
+        frame.setSize(width, height);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
 
     }
 

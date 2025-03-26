@@ -11,7 +11,6 @@ public class Main {
     static  AWS_KMS_EncryptData awsKmsEncryptData = new AWS_KMS_EncryptData();
     static DynamodbHelper dynamodbHelper = new DynamodbHelper();
 
-    static EncryptData encryptData = new EncryptData();
 
     public static void main(String[] args) {
         dynamodbHelper.getEncryptedAccountInfo();
