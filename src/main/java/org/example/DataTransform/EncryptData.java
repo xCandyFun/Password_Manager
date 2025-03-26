@@ -62,6 +62,12 @@ public class EncryptData {
     // Encrypt the account info using the master password and salt
     public String encryptList(List<String> accountInfo, String masterPassword, String salt) {
         try {
+
+            System.out.println(accountInfo.get(0));
+            System.out.println(accountInfo.get(1));
+            System.out.println(accountInfo.get(2));
+            System.out.println(accountInfo.get(3));
+
             SecretKey key = deriveKey(masterPassword, salt);
             Cipher cipher = Cipher.getInstance(algorithm);
             cipher.init(Cipher.ENCRYPT_MODE, key);

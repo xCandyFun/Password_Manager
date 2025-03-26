@@ -179,14 +179,17 @@ public class NewAccountWindow {
                 String usernameData = usernameInput.getText();
 
                 char[] passwordData = passwordInput.getPassword();
-                char getPasswordData = passwordData[0];
+                String passwordDataString = new String(passwordData);
+                //char getPasswordData = passwordData[0];
 
-                String passwordDataString = Character.toString(getPasswordData);
+                //String passwordDataString = Character.toString(getPasswordData);
 
                 accountInfo.add(accountToWhereData);
                 accountInfo.add(emailData);
                 accountInfo.add(usernameData);
                 accountInfo.add(passwordDataString);
+
+                Arrays.fill(passwordData, '\0');
 
                 //TODO call encrypt class to encrypt the data in the List
                 //call the class that take care of the database
