@@ -62,10 +62,6 @@ public class MainWindow {
         actionButtonForAddNew();
         actionButtonShowAll();
 
-
-
-
-
         while (true) {
             usbMonitor.checkUsb();
         }
