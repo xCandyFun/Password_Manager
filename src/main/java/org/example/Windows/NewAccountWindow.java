@@ -47,10 +47,6 @@ public class NewAccountWindow {
 
     List<String> accountInfo = new ArrayList<>();
 
-    //TODO get the data from usb
-    String masterPassword;
-
-
     public NewAccountWindow(MainWindow mainWindow){
         this.mainWindow = mainWindow;
 
@@ -191,9 +187,7 @@ public class NewAccountWindow {
 
                 Arrays.fill(passwordData, '\0');
 
-                //TODO call encrypt class to encrypt the data in the List
-                //call the class that take care of the database
-
+                //call encrypt class to encrypt the data in the List
                 encryptData.getEncryptedKey(accountInfo);
 
 
