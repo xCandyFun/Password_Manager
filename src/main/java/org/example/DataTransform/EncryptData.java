@@ -7,13 +7,12 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 public class EncryptData {
     DynamodbHelper dynamodbHelper = new DynamodbHelper();
@@ -26,6 +25,7 @@ public class EncryptData {
     private static final String pbkAlgorithm = "PBKDF2WithHmacSHA256";
     private static final int iterationCount = 1000;
     private static final int keyLength = 256;
+    private final int listSize = 4;
 
 
     public void getEncryptedKey(List<String> accountInfo){
@@ -68,6 +68,11 @@ public class EncryptData {
             System.out.println(accountInfo.get(2));
             System.out.println(accountInfo.get(3));
 
+            String placeCredential = accountInfo.get(0);
+            String emailCredential = accountInfo.get(1);
+            String usernameCredential = accountInfo.get(2);
+            String passwordCredential = accountInfo.get(3);
+
             SecretKey key = deriveKey(masterPassword, salt);
             Cipher cipher = Cipher.getInstance(algorithm);
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -92,32 +97,72 @@ public class EncryptData {
         }
     }
 
-    // Store encrypted account data (and salt) in a secure way
-    private void storeAccountData(List<String> encryptedAccountInfoList, String masterPassword) {
+    public Map<String, String> encryptedCredentials(List<String> accountInfo, String masterPassword, String salt){
+       try {
+           if (accountInfo.size() < listSize){
+               throw new IllegalArgumentException("Account info must contain at least four elements.");
+           }
 
-        try {
+           String placeCredential = accountInfo.get(0);
+           String emailCredential = accountInfo.get(1);
+           String usernameCredential = accountInfo.get(2);
+           String passwordCredential = accountInfo.get(3);
 
-            String salt = generateSalt();
+           SecretKey key = deriveKey(masterPassword, salt);
+           Cipher cipher = Cipher.getInstance(algorithm);
+           cipher.init(Cipher.ENCRYPT_MODE, key);
 
-            System.out.println("Generated Salt (Encryption): " + salt);
+           Map<String, String> encryptedMap = new LinkedHashMap<>();
+           encryptedMap.put("place", encrypt(placeCredential, cipher));
+           encryptedMap.put("email", encrypt(emailCredential, cipher));
+           encryptedMap.put("username", encrypt(usernameCredential, cipher));
+           encryptedMap.put("password", encrypt(passwordCredential, cipher));
 
-            String encryptedData = encryptList(encryptedAccountInfoList, masterPassword, salt);
+           return encryptedMap;
+       }catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+           throw new RuntimeException("Encryption failed: " + e.getMessage(), e);
+       }
+    }
 
-            List<String> encryptedDataAndSalt = new ArrayList<>();
-
-            encryptedDataAndSalt.add(encryptedData);
-            encryptedDataAndSalt.add(salt);
-
-            System.out.println(encryptedData);
-
-            // Store the encrypted data and salt (in DynamoDB, database, or secure storage)
-            dynamodbHelper.insertEncryptedAccountInfo(encryptedDataAndSalt);
-
-
-        } catch (Exception e) {
-            throw new RuntimeException("Encryption failed due to " + e.getMessage(), e);
+    private String encrypt(String data, Cipher cipher){
+        try{
+            byte[] encryptedBytes = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(encryptedBytes);
+        }catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new RuntimeException("Encryption failed for: " + data, e);
         }
     }
+
+    // Store encrypted account data (and salt) in a secure way
+        private void storeAccountData(List<String> encryptedAccountInfoList, String masterPassword) {
+
+            try {
+
+                String salt = generateSalt();
+
+                //System.out.println("Generated Salt (Encryption): " + salt);
+
+                //String encryptedData = encryptList(encryptedAccountInfoList, masterPassword, salt);
+                Map<String, String> encryptedAccountInfo = encryptedCredentials(encryptedAccountInfoList, masterPassword, salt);
+
+
+                List<String> encryptedDataAndSalt = new ArrayList<>();
+
+                encryptedAccountInfo.forEach((key, value) -> encryptedDataAndSalt.add(value));
+
+                //encryptedDataAndSalt.add(encryptedData);
+                encryptedDataAndSalt.add(salt);
+
+                //System.out.println(encryptedData);
+
+                // Store the encrypted data and salt (in DynamoDB, database, or secure storage)
+                dynamodbHelper.insertEncryptedAccountInfo(encryptedDataAndSalt);
+
+
+            } catch (Exception e) {
+                throw new RuntimeException("Encryption failed due to " + e.getMessage(), e);
+            }
+        }
 
     public SecretKey generateKey() {
         try {

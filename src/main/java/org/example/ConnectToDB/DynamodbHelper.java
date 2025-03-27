@@ -34,6 +34,8 @@ public class DynamodbHelper {
 
     private final String tableNameAccounts = "AccountsInfo";
 
+    private final int listSize = 5;
+
     public DynamodbHelper(){
         this.dynamoDbClient = DynamoDbClient.builder()
                 .region(Region.EU_NORTH_1)
@@ -112,14 +114,24 @@ public class DynamodbHelper {
     }
 
     public void insertEncryptedAccountInfo(List<String> encryptedDataAndSalt){
+        if (encryptedDataAndSalt.size() < listSize){
+            throw new IllegalArgumentException("Invalid data: Expected at least 5 elements (4 encrypted values + salt).");
+        }
 
-        String encryptedData = encryptedDataAndSalt.get(0);
-        String encryptedSalt = encryptedDataAndSalt.get(1);
+        //String encryptedData = encryptedDataAndSalt.get(0);
+        String encryptedPlace = encryptedDataAndSalt.get(0);
+        String encryptedEmail = encryptedDataAndSalt.get(1);
+        String encryptedUsername = encryptedDataAndSalt.get(2);
+        String encryptedPassword = encryptedDataAndSalt.get(3);
+        String encryptedSalt = encryptedDataAndSalt.get(4);
 
         PutItemRequest putItemRequest = PutItemRequest.builder()
                 .tableName(tableNameAccounts)
                 .item(Map.of("Id", AttributeValue.builder().s(accountsUUID.toString()).build(),
-                        "EncryptedAccount", AttributeValue.builder().s(encryptedData).build(),
+                        "EncryptedPlace", AttributeValue.builder().s(encryptedPlace).build(),
+                        "EncryptedEmail", AttributeValue.builder().s(encryptedEmail).build(),
+                        "EncryptedUsername", AttributeValue.builder().s(encryptedUsername).build(),
+                        "EncryptedPassword", AttributeValue.builder().s(encryptedPassword).build(),
                         "EncryptedSalt", AttributeValue.builder().s(encryptedSalt).build()
                 ))
                 .build();
@@ -136,11 +148,19 @@ public class DynamodbHelper {
         for (Map<String, AttributeValue> item : items){
 
             String Id = item.get("Id").s();
-            String encryptedAccount = item.get("EncryptedAccount").s();
+            //String encryptedAccount = item.get("EncryptedAccount").s();
+            String encryptedPlace = item.get("EncryptedPlace").s();
+            String encryptedEmail = item.get("EncryptedEmail").s();
+            String encryptedUsername = item.get("EncryptedUsername").s();
+            String encryptedPassword = item.get("EncryptedPassword").s();
             String encryptedSalt = item.get("EncryptedSalt").s();
 
             encryptedAccountList.add(Id);
-            encryptedAccountList.add(encryptedAccount);
+            //encryptedAccountList.add(encryptedAccount);
+            encryptedAccountList.add(encryptedPlace);
+            encryptedAccountList.add(encryptedEmail);
+            encryptedAccountList.add(encryptedUsername);
+            encryptedAccountList.add(encryptedPassword);
             encryptedAccountList.add(encryptedSalt);
 
         }
