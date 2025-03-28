@@ -8,10 +8,7 @@ import software.amazon.awssdk.services.dynamodb.model.*;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class DynamodbHelper {
 
@@ -139,29 +136,40 @@ public class DynamodbHelper {
         dynamoDbClient.putItem(putItemRequest);
     }
 
-    public List<String> getEncryptedAccountInfo(){
+    public List<Map<String, String>> getEncryptedAccountInfo(){
 
-        List<Map<String, AttributeValue>> items = scanTable();
+        List<Map<String, AttributeValue>> AllItems = scanTable();
 
-        List<String> encryptedAccountList = new ArrayList<>();
+        List<Map<String, String>> encryptedAccountList = new ArrayList<>();
 
-        for (Map<String, AttributeValue> item : items){
+        for (Map<String, AttributeValue> item : AllItems){
 
-            String Id = item.get("Id").s();
-            //String encryptedAccount = item.get("EncryptedAccount").s();
-            String encryptedPlace = item.get("EncryptedPlace").s();
-            String encryptedEmail = item.get("EncryptedEmail").s();
-            String encryptedUsername = item.get("EncryptedUsername").s();
-            String encryptedPassword = item.get("EncryptedPassword").s();
-            String encryptedSalt = item.get("EncryptedSalt").s();
+            Map<String, String> record = new HashMap<>();
 
-            encryptedAccountList.add(Id);
-            //encryptedAccountList.add(encryptedAccount);
-            encryptedAccountList.add(encryptedPlace);
-            encryptedAccountList.add(encryptedEmail);
-            encryptedAccountList.add(encryptedUsername);
-            encryptedAccountList.add(encryptedPassword);
-            encryptedAccountList.add(encryptedSalt);
+            record.put("Id", item.get("Id").s());
+            record.put("EncryptedPlace", item.get("EncryptedPlace").s());
+            record.put("EncryptedEmail", item.get("EncryptedEmail").s());
+            record.put("EncryptedUsername", item.get("EncryptedUsername").s());
+            record.put("EncryptedPassword", item.get("EncryptedPassword").s());
+            record.put("EncryptedSalt", item.get("EncryptedSalt").s());
+
+            encryptedAccountList.add(record);
+
+//            String Id = item.get("Id").s();
+//            //String encryptedAccount = item.get("EncryptedAccount").s();
+//            String encryptedPlace = item.get("EncryptedPlace").s();
+//            String encryptedEmail = item.get("EncryptedEmail").s();
+//            String encryptedUsername = item.get("EncryptedUsername").s();
+//            String encryptedPassword = item.get("EncryptedPassword").s();
+//            String encryptedSalt = item.get("EncryptedSalt").s();
+//
+//            encryptedAccountList.add(Id);
+//            //encryptedAccountList.add(encryptedAccount);
+//            encryptedAccountList.add(encryptedPlace);
+//            encryptedAccountList.add(encryptedEmail);
+//            encryptedAccountList.add(encryptedUsername);
+//            encryptedAccountList.add(encryptedPassword);
+//            encryptedAccountList.add(encryptedSalt);
 
         }
 
@@ -170,10 +178,23 @@ public class DynamodbHelper {
 
     private List<Map<String, AttributeValue>> scanTable(){
 
-        ScanRequest scanRequest = ScanRequest.builder().tableName(tableNameAccounts).build();
-        ScanResponse scanResponse = dynamoDbClient.scan(scanRequest);
+        List<Map<String, AttributeValue>> allItems = new ArrayList<>();
+        Map<String, AttributeValue> lastEvaluatedKey = null;
 
-        return scanResponse.items();
+        do {
+            ScanRequest.Builder scanRequestBuilder = ScanRequest.builder().tableName(tableNameAccounts);
+            if (lastEvaluatedKey != null){
+                scanRequestBuilder.exclusiveStartKey(lastEvaluatedKey);
+            }
+
+            ScanResponse scanResponse = dynamoDbClient.scan(scanRequestBuilder.build());
+            allItems.addAll(scanResponse.items());
+
+            lastEvaluatedKey = scanResponse.hasLastEvaluatedKey() ? scanResponse.lastEvaluatedKey() : null;
+
+        }while (lastEvaluatedKey != null && !lastEvaluatedKey.isEmpty());
+
+        return allItems;
 
     }
 

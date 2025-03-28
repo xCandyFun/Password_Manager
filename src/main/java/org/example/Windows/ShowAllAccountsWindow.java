@@ -61,9 +61,15 @@ public class ShowAllAccountsWindow {
     }
 
     private void showData(){
-        List<String> accountInfo = decryptData.decryptData();
+       List<Map<String, String>> accountInfoList = decryptData.decryptData();
 
-        //TODO Need to split the account info
-        System.out.println(accountInfo);
+       for (Map<String, String> accountInfo : accountInfoList) {
+           System.out.println("Decrypted Account Info:");
+           System.out.println("Place: " + accountInfo.get("DecryptedPlace"));
+           System.out.println("Email: " + accountInfo.get("DecryptedEmail"));
+           System.out.println("Username: " + accountInfo.get("DecryptedUsername"));
+           System.out.println("Password: " + accountInfo.get("DecryptedPassword"));
+           System.out.println("----------------------");
+       }
     }
 }

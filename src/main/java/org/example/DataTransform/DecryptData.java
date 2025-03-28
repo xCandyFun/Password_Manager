@@ -12,10 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DecryptData {
 
@@ -37,58 +34,42 @@ public class DecryptData {
     private final int listSize = 6;
 
     // Decrypt the account info using the master password and salt
-    public List<String> decryptData() {
+    public List<Map<String, String>> decryptData() {
         try {
 
-            List<String> encryptedData = dynamodbHelper.getEncryptedAccountInfo();
+            List<Map<String, String>> encryptedDataList = dynamodbHelper.getEncryptedAccountInfo();
 
-            if (encryptedData.isEmpty() || encryptedData.size() < listSize){
+            //System.out.println("Encrypted Data List: " + encryptedDataList);
+
+            if (encryptedDataList.isEmpty()){
                 throw new IllegalStateException("DynamoDB returned an empty or incomplete list. Cannot decrypt data.");
             }
 
-            //String encryptedAccountInfo = encryptedData.get(1);
-            String encryptedPlace = encryptedData.get(1);
-            String encryptedEmail = encryptedData.get(2);
-            String encryptedUsername = encryptedData.get(3);
-            String encryptedPassword = encryptedData.get(4);
-            String encryptedSalt = encryptedData.get(5);
+            List<Map<String, String>> decryptedAccounts = new ArrayList<>();
 
-            System.out.println("Raw Encrypted Data: " + encryptedData);
-            System.out.println(encryptedPlace);
-            //String encryptedSalt = encryptedData.get(2);
+            for (Map<String, String> encryptedData : encryptedDataList){
 
-            //TODO Remove Log
-            System.out.println("Encrypted Data (Decryption): " + encryptedData);
-            System.out.println("Retrieved Salt (Decryption): " + encryptedSalt);
+                String encryptedPlace = encryptedData.get("EncryptedPlace");
+                String encryptedEmail = encryptedData.get("EncryptedEmail");
+                String encryptedUsername = encryptedData.get("EncryptedUsername");
+                String encryptedPassword = encryptedData.get("EncryptedPassword");
+                String encryptedSalt = encryptedData.get("EncryptedSalt");
 
-            //NEED KEY FROM THE DATA BASE
-            SecretKey key = EncryptData.deriveKey(masterPassword, encryptedSalt);
+                SecretKey key = EncryptData.deriveKey(masterPassword, encryptedSalt);
+                Cipher cipher = Cipher.getInstance(EncryptData.algorithm);
+                cipher.init(Cipher.DECRYPT_MODE, key);
 
-            System.out.println("Derived Key (Decryption): " + Base64.getEncoder().encodeToString(key.getEncoded()));
+                Map<String, String> decryptedRecord = new HashMap<>();
 
-            Cipher cipher = Cipher.getInstance(EncryptData.algorithm);
+                decryptedRecord.put("DecryptedPlace", decrypt(encryptedPlace, cipher));
+                decryptedRecord.put("DecryptedEmail", decrypt(encryptedEmail, cipher));
+                decryptedRecord.put("DecryptedUsername", decrypt(encryptedUsername, cipher));
+                decryptedRecord.put("DecryptedPassword", decrypt(encryptedPassword, cipher));
 
-            cipher.init(Cipher.DECRYPT_MODE, key);
+                decryptedAccounts.add(decryptedRecord);
+            }
 
-            //byte[] encryptedBytes = Base64.getDecoder().decode(encryptedAccountInfo);
-            String decryptedPlace = decrypt(encryptedPlace, cipher);
-            String decryptedEmail = decrypt(encryptedEmail, cipher);
-            String decryptedUsername = decrypt(encryptedUsername, cipher);
-            String decryptedPassword = decrypt(encryptedPassword, cipher);
-
-            System.out.println("Decrypted Data:");
-            System.out.println("Place: " + decryptedPlace);
-            System.out.println("Email: " + decryptedEmail);
-            System.out.println("Username: " + decryptedUsername);
-            System.out.println("Password: " + decryptedPassword);
-
-            return Arrays.asList(decryptedPlace, decryptedEmail, decryptedUsername, decryptedPassword);
-
-            //String decryptedString = new String(decryptedBytes);
-
-            //System.out.println("Decrypted data: " + decryptedString);
-
-            //return Arrays.asList(decryptedString.split(","));
+            return decryptedAccounts;
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
             throw new RuntimeException("Encryption failed due to " + e.getMessage(), e);
@@ -97,7 +78,7 @@ public class DecryptData {
 
     private String decrypt(String encryptedData, Cipher cipher){
         try{
-            System.out.println("Encrypted Data (Before Decoding): " + encryptedData);
+            //System.out.println("Encrypted Data (Before Decoding): " + encryptedData);
             byte[] encryptedBytes = Base64.getDecoder().decode(encryptedData);
             //byte[]encryptedBytes = Base64.getUrlDecoder().decode(encryptedData);
             byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
